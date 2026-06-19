@@ -1,25 +1,16 @@
-import Sidebar from './components/Sidebar';
-import MobileHeader from './components/MobileHeader';
-import SectionNav from './components/SectionNav';
-import Hero from './sections/Hero';
-import About from './sections/About';
-import Skills from './sections/Skills';
-import Projects from './sections/Projects';
-import Contact from './sections/Contact';
+import { Routes, Route } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
+import Home from './pages/Home';
+import ProjectDetail from './pages/ProjectDetail';
 
 export default function App() {
   return (
     <>
-      <Sidebar />
-      <MobileHeader />
-      <SectionNav />
-      <main className="main-content">
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Contact />
-      </main>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/projects/:slug" element={<ProjectDetail />} />
+      </Routes>
     </>
   );
 }

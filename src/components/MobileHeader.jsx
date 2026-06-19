@@ -112,7 +112,7 @@ const st = {
   },
   progressFill: {
     height: '100%',
-    background: 'linear-gradient(90deg, #646cff, #a78bfa)',
+    background: '#646cff',
     transition: 'width 0.1s linear',
   },
   overlay: {
