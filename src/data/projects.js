@@ -25,6 +25,7 @@ export const projects = [
     team: '1인',
     liveUrl: 'https://gamestack.store',
     liveLabel: 'gamestack.store',
+    demoUrl: 'https://youtu.be/O5ymmClGbLg',
     repos: [
       { label: 'Frontend', url: 'https://github.com/asd2599/eggtalk-frontend' },
       { label: 'Backend', url: 'https://github.com/asd2599/eggtalk-backend' },
