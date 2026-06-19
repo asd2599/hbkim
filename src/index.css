@@ -414,22 +414,49 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .form-status.ok  { color: #5fd38a; }
 .form-status.err { color: #ff7676; }
 
-/* ── Contact card ── */
+/* ── Contact card (아케이드 HUD) ── */
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
   color: var(--text-dim);
-  font-size: 1rem;
-  padding: 0.85rem 1.5rem;
-  background: var(--surface);
-  border-radius: var(--r-md);
-  border: 1px solid var(--border);
+  padding: 0.7rem 0.9rem;
+  background: #0c0c14;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-2);
   width: 100%;
   max-width: 420px;
-  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
-.contact-item:hover { border-color: var(--accent); color: var(--text); transform: translateY(-2px); }
+.contact-item:hover {
+  color: #fff;
+  border-color: var(--c, var(--neon-cyan));
+  box-shadow: 0 0 18px -6px var(--c, var(--neon-cyan));
+  background: #0e0e1a;
+  transform: translateX(4px);
+}
+.ct-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--c, var(--neon-cyan));
+  background: #05060b;
+  border: 1px solid var(--c, var(--neon-cyan));
+  box-shadow: inset 0 0 12px -6px var(--c, var(--neon-cyan)), 0 0 10px -7px var(--c, var(--neon-cyan));
+}
+.ct-svg { width: 20px; height: 20px; }
+.ct-label { flex: 1; font-size: 0.92rem; font-family: var(--font-mono); letter-spacing: 0.01em; }
+.ct-arrow {
+  font-size: 0.5rem;
+  color: var(--c, var(--neon-cyan));
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.contact-item:hover .ct-arrow { opacity: 1; transform: translateX(0); }
 
 /* 상세 페이지는 스냅 없이 매끄럽게 스크롤 */
 .detail-page section { scroll-snap-align: none; }
