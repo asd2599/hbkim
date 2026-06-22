@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { profile } from '../data/profile';
 
 /* ────────────────────────────────────────────
@@ -61,6 +61,14 @@ export default function CareerQuiz() {
   const [openCard, setOpenCard] = useState(null); // 열린(비하인드 공개) 카드 index
 
   const logRef = useRef(null);
+
+  // 모달 열렸을 때 ESC로 닫기
+  useEffect(() => {
+    if (openCard === null) return;
+    const onKey = (e) => { if (e.key === 'Escape') setOpenCard(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [openCard]);
 
   const solvedCount = solved.filter(Boolean).length;
   const remaining = TOTAL_QUESTIONS - used;
@@ -210,44 +218,46 @@ export default function CareerQuiz() {
         </div>
       )}
 
-      {/* ── 회사 카드 덱 (역할·개발내용은 항상 노출, 회사명만 가림) ── */}
+      {/* ── 회사 카드 덱 (4행 1열, 역할·개발내용은 항상 노출·회사명만 가림) ── */}
       <div className="cq-deck">
         {STAGES.map((s, i) => {
           const unlocked = solved[i];
-          const open = openCard === i;
           return (
             <button
               key={s.company}
               type="button"
-              className={`cq-card${unlocked ? ' unlocked' : ' locked'}${open ? ' open' : ''}`}
-              onClick={() => unlocked && setOpenCard(open ? null : i)}
+              className={`cq-card${unlocked ? ' unlocked' : ' locked'}`}
+              onClick={() => unlocked && setOpenCard(i)}
               disabled={!unlocked}
-              aria-pressed={open}
             >
-              <div className="cq-card-inner">
-                {/* 앞면 */}
-                <div className="cq-card-face front">
-                  <div className="cq-card-top">
-                    <span className="cq-card-company">{unlocked ? s.company : '???'}</span>
-                    <span className="cq-card-period">{s.period}</span>
-                  </div>
+              <span className="cq-card-stage">{'★'.repeat(s.quiz.level)}</span>
+              <div className="cq-card-body">
+                <div className="cq-card-line">
+                  <span className="cq-card-company">{unlocked ? s.company : '???'}</span>
                   <span className="cq-card-role">{s.role}</span>
-                  <p className="cq-card-desc">{s.desc}</p>
-                  <span className={`cq-card-foot${unlocked ? ' on' : ''}`}>
-                    {unlocked ? '비하인드 보기 →' : `STAGE ${i + 1} · ${'★'.repeat(s.quiz.level)} · LOCKED`}
-                  </span>
+                  <span className="cq-card-period">{s.period}</span>
                 </div>
-                {/* 뒷면 (비하인드) */}
-                <div className="cq-card-face back">
-                  <span className="cq-card-company">{s.company}</span>
-                  <p className="cq-card-behind">{s.behind}</p>
-                  <span className="cq-card-foot on">← 닫기</span>
-                </div>
+                <p className="cq-card-desc">{s.desc}</p>
               </div>
+              <span className={`cq-card-foot${unlocked ? ' on' : ''}`}>
+                {unlocked ? '비하인드 ↗' : 'LOCKED'}
+              </span>
             </button>
           );
         })}
       </div>
+
+      {/* ── 비하인드 모달 ── */}
+      {openCard !== null && STAGES[openCard] && (
+        <div className="cq-modal-overlay" onClick={() => setOpenCard(null)}>
+          <div className="cq-modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="cq-modal-close" onClick={() => setOpenCard(null)} aria-label="닫기">✕</button>
+            <span className="cq-modal-company">{STAGES[openCard].company}</span>
+            <span className="cq-modal-meta">{STAGES[openCard].role} · {STAGES[openCard].period}</span>
+            <p className="cq-modal-behind">{STAGES[openCard].behind}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1380,72 +1380,105 @@ body::after {
 }
 .cq-hint-more:hover { text-decoration: underline; }
 
-/* ── 회사 카드 덱 ── */
+/* ── 회사 카드 덱 (4행 1열, 클릭 시 모달) ── */
 .cq-deck {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.7rem;
-  margin-top: 1.2rem;
-}
-@media (max-width: 720px) {
-  .cq-deck { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 440px) {
-  .cq-deck { grid-template-columns: 1fr; }
-}
-.cq-card {
-  position: relative;
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: default;
-  perspective: 1000px;
-  min-height: 158px;
-}
-.cq-card.unlocked { cursor: pointer; }
-
-.cq-card-inner {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
-  transform-style: preserve-3d;
-}
-.cq-card.open .cq-card-inner { transform: rotateY(180deg); }
-
-.cq-card-face {
-  grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 1rem 1.05rem;
+  gap: 0.55rem;
+  margin-top: 1.2rem;
+}
+.cq-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
   border-radius: var(--r-md);
   border: 1px solid var(--border);
   background: var(--surface);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  cursor: default;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
 }
-.cq-card-face.back {
-  transform: rotateY(180deg);
-  background: linear-gradient(180deg, #101622 0%, #0a0a12 100%);
-  border-color: #2de2e655;
-}
-.cq-card.locked .cq-card-face.front { border-style: dashed; opacity: 0.92; }
-.cq-card.unlocked .cq-card-face.front { border-color: #646cff55; box-shadow: var(--shadow-glow); }
+.cq-card.locked { border-style: dashed; opacity: 0.9; }
+.cq-card.unlocked { cursor: pointer; border-color: #646cff55; }
+.cq-card.unlocked:hover { border-color: var(--accent); box-shadow: var(--shadow-glow); transform: translateY(-2px); }
 
-.cq-card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
-.cq-card-company { font-size: 1rem; font-weight: 700; color: var(--text); }
-.cq-card.locked .cq-card-company { color: var(--text-mute); letter-spacing: 0.15em; }
-.cq-card-period { font-size: 0.7rem; color: var(--text-mute); font-family: var(--font-mono); }
-.cq-card-role { font-size: 0.8rem; color: var(--accent-2); }
-.cq-card-desc { font-size: 0.84rem; color: var(--text-mute); line-height: 1.6; margin: 0; flex: 1; }
-.cq-card-behind { font-size: 0.86rem; color: var(--text-dim); line-height: 1.7; margin: 0.2rem 0 0; flex: 1; }
-.cq-card-foot { font-size: 0.68rem; font-family: var(--font-mono); color: var(--text-mute); letter-spacing: 0.03em; }
+.cq-card-stage {
+  flex-shrink: 0;
+  width: 3rem;
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: var(--neon-yellow);
+}
+.cq-card.locked .cq-card-stage { color: var(--text-mute); }
+
+.cq-card-body { flex: 1; min-width: 0; }
+.cq-card-line { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.cq-card-company { font-size: 0.98rem; font-weight: 700; color: var(--text); }
+.cq-card.locked .cq-card-company { color: var(--text-mute); letter-spacing: 0.18em; }
+.cq-card-role { font-size: 0.78rem; color: var(--accent-2); }
+.cq-card-period { font-size: 0.7rem; color: var(--text-mute); font-family: var(--font-mono); margin-left: auto; }
+.cq-card-desc { font-size: 0.82rem; color: var(--text-mute); line-height: 1.55; margin: 0.2rem 0 0; }
+.cq-card-foot {
+  flex-shrink: 0;
+  font-size: 0.66rem;
+  font-family: var(--font-mono);
+  color: var(--text-mute);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
 .cq-card-foot.on { color: var(--neon-cyan); }
 
+/* ── 비하인드 모달 ── */
+.cq-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(3, 3, 8, 0.72);
+  backdrop-filter: blur(3px);
+  animation: cqFade 0.2s ease;
+}
+.cq-modal {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 82vh;
+  overflow-y: auto;
+  padding: 1.7rem 1.7rem 1.9rem;
+  border-radius: var(--r-md);
+  border: 1px solid #2de2e655;
+  background: linear-gradient(180deg, #0d1320 0%, #08080f 100%);
+  box-shadow: 0 24px 70px -20px rgba(0, 0, 0, 0.85);
+  animation: cqPop 0.25s ease;
+}
+.cq-modal-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  width: 2rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-mute);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.cq-modal-close:hover { color: var(--text); }
+.cq-modal-company { display: block; font-size: 1.2rem; font-weight: 700; color: var(--text); }
+.cq-modal-meta { display: block; font-size: 0.76rem; color: var(--accent-2); font-family: var(--font-mono); margin-top: 0.25rem; }
+.cq-modal-behind { font-size: 0.92rem; color: var(--text-dim); line-height: 1.85; margin: 1.1rem 0 0; }
+
+@keyframes cqFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cqPop { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+
 @media (prefers-reduced-motion: reduce) {
-  .cq-card-inner { transition: none; }
+  .cq-modal-overlay, .cq-modal { animation: none; }
+  .cq-card.unlocked:hover { transform: none; }
 }
