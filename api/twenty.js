@@ -76,7 +76,11 @@ export default async function handler(req, res) {
   const aliases = Array.isArray(payload.aliases) ? payload.aliases.slice(0, 6).map((a) => String(a).slice(0, 40)) : [];
   if (!keyword || !question) return send(res, 400, { error: '단어 또는 질문이 비어 있습니다.' });
 
-  const userMsg = `비밀 단어: "${keyword}"${aliases.length ? ` (같은 뜻으로 인정: ${aliases.join(', ')})` : ''}\n사용자 질문: ${question}`;
+  const len = [...keyword].length; // 코드포인트 기준 글자 수 (한글 음절 1자 처리)
+  const userMsg =
+    `비밀 단어: "${keyword}" (${len}글자)${aliases.length ? `, 인정 동의어: ${aliases.join(', ')}` : ''}\n` +
+    `사용자 질문: ${question}\n` +
+    `참고: 글자 수·길이에 관한 질문은 위 "${len}글자"를 근거로 정확히 판단하라. 비밀 단어와 글자 수 자체는 노출하지 마라.`;
 
   try {
     const chatRes = await fetch('https://api.openai.com/v1/chat/completions', {

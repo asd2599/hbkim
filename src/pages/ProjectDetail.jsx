@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getProject, projects } from '../data/projects';
 
@@ -229,146 +229,66 @@ function youtubeId(url) {
   return m ? m[1] : null;
 }
 
-// 스크롤 진입 감지 (1회)
-function useInView() {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setInView(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return [ref, inView];
-}
-
-// 주요 기능 — 넓은 화면에선 가로 핀(pinned) 스크롤, 좁은 화면/모션최소화는 세로 스택.
+// 주요 기능 — 이미지(왼쪽·프레임) + 설명(오른쪽) 고정, 한 페이지씩 슬라이드로 넘김.
 function FeatureGallery({ items }) {
-  const reduced =
-    typeof window !== 'undefined' &&
-    window.matchMedia &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const [pinned, setPinned] = useState(false);
-  const [wrapH, setWrapH] = useState(0);
-  const [tx, setTx] = useState(0);
-  const wrapRef = useRef(null);
-  const stickyRef = useRef(null);
-  const trackRef = useRef(null);
-  const TOP = 40;
-
-  useEffect(() => {
-    if (reduced) return;
-    const mq = window.matchMedia('(min-width: 860px)');
-    const apply = () => setPinned(mq.matches);
-    apply();
-    mq.addEventListener('change', apply);
-    return () => mq.removeEventListener('change', apply);
-  }, [reduced]);
-
-  useEffect(() => {
-    if (!pinned) return;
-    const wrap = wrapRef.current;
-    const sticky = stickyRef.current;
-    const track = trackRef.current;
-    if (!wrap || !sticky || !track) return;
-    let dist = 0;
-    let raf = 0;
-    const measure = () => {
-      dist = Math.max(0, track.scrollWidth - track.clientWidth);
-      setWrapH(sticky.offsetHeight + dist);
-    };
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const top = wrap.getBoundingClientRect().top;
-        const scrolled = Math.min(Math.max(TOP - top, 0), dist);
-        setTx(-scrolled);
-      });
-    };
-    measure();
-    onScroll();
-    const onResize = () => {
-      measure();
-      onScroll();
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize);
-    track.querySelectorAll('img').forEach((im) => {
-      if (!im.complete) im.addEventListener('load', onResize, { once: true });
-    });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
-      cancelAnimationFrame(raf);
-    };
-  }, [pinned, items]);
-
-  if (!pinned) {
-    return (
-      <Section title="주요 기능">
-        <div style={S.features}>
-          {items.map((g, i) => <AnnotatedFeature key={g.src} shot={g} index={i} />)}
-        </div>
-      </Section>
-    );
-  }
+  const [cur, setCur] = useState(0);
+  const n = items.length;
+  const go = (d) => setCur((c) => (c + d + n) % n);
 
   return (
     <Section title="주요 기능">
-      <p style={S.hgalHint}>↓ 스크롤하면 기능을 가로로 넘겨봅니다 →</p>
-      <div className="hgal" ref={wrapRef} style={{ height: wrapH || undefined }}>
-        <div className="hgal-sticky" ref={stickyRef} style={{ top: TOP }}>
-          <div className="hgal-track" ref={trackRef} style={{ transform: `translate3d(${tx}px, 0, 0)` }}>
+      <div className="feat-slider">
+        <div className="feat-viewport">
+          <div className="feat-track" style={{ transform: `translateX(-${cur * 100}%)` }}>
             {items.map((g, i) => (
-              <div className="hgal-panel" key={g.src}>
-                <AnnotatedFeature shot={g} index={i} />
+              <div className={`feat-slide${i === cur ? ' active' : ''}`} key={g.src} aria-hidden={i !== cur}>
+                <figure className="feat-figure">
+                  <img src={g.src} alt={g.title} loading="lazy" />
+                  {g.points?.map((p, pi) => (
+                    <span key={pi} className="ann-ring" style={{ left: `${p.x}%`, top: `${p.y}%`, '--i': pi }}>{pi + 1}</span>
+                  ))}
+                </figure>
+                <div className="feat-info">
+                  <span className="ann-eyebrow arcade">FEATURE {String(i + 1).padStart(2, '0')}</span>
+                  <h3 className="ann-title">{g.title}</h3>
+                  <p className="ann-caption">{g.caption}</p>
+                  {g.points && (
+                    <ol className="ann-list">
+                      {g.points.map((p, pi) => (
+                        <li key={pi} className="ann-li" style={{ '--i': pi }}>
+                          <span className="ann-num">{pi + 1}</span>
+                          <span>{p.text}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </Section>
-  );
-}
 
-// 주석 기능 쇼케이스 — 스크린샷 위에 번호 동그라미를 찍고, 옆에 같은 번호로 설명.
-// 스크롤 진입 시 이미지 슬라이드 → 동그라미 팝(핑) → 설명이 순서대로 등장.
-function AnnotatedFeature({ shot, index }) {
-  const [ref, inView] = useInView();
-  const variant = shot.wide ? ' wide' : index % 2 ? ' rev' : '';
-  return (
-    <div ref={ref} className={`ann-feature${variant}${inView ? ' in' : ''}`}>
-      <figure className="ann-figure">
-        <img src={shot.src} alt={shot.title} loading="lazy" />
-        {shot.points?.map((p, i) => (
-          <span key={i} className="ann-ring" style={{ left: `${p.x}%`, top: `${p.y}%`, '--i': i }}>{i + 1}</span>
-        ))}
-      </figure>
-      <div className="ann-info">
-        <span className="ann-eyebrow arcade">FEATURE {String(index + 1).padStart(2, '0')}</span>
-        <h3 className="ann-title">{shot.title}</h3>
-        <p className="ann-caption">{shot.caption}</p>
-        {shot.points && (
-          <ol className="ann-list">
-            {shot.points.map((p, i) => (
-              <li key={i} className="ann-li" style={{ '--i': i }}>
-                <span className="ann-num">{i + 1}</span>
-                <span>{p.text}</span>
-              </li>
-            ))}
-          </ol>
+        {n > 1 && (
+          <div className="feat-nav">
+            <button type="button" className="feat-arrow" onClick={() => go(-1)} aria-label="이전 기능">←</button>
+            <div className="feat-dots">
+              {items.map((g, i) => (
+                <button
+                  key={g.src}
+                  type="button"
+                  className={`feat-dot${i === cur ? ' on' : ''}`}
+                  onClick={() => setCur(i)}
+                  aria-label={`${i + 1}번 기능`}
+                  aria-current={i === cur}
+                />
+              ))}
+            </div>
+            <span className="feat-count">{cur + 1} / {n}</span>
+            <button type="button" className="feat-arrow" onClick={() => go(1)} aria-label="다음 기능">→</button>
+          </div>
         )}
       </div>
-    </div>
+    </Section>
   );
 }
 
@@ -413,9 +333,6 @@ const S = {
   cover: { width: '100%', maxHeight: '440px', objectFit: 'cover', objectPosition: 'top', borderRadius: '16px', border: '1px solid #2a2a3e', display: 'block', boxShadow: '0 18px 50px -20px rgba(0,0,0,0.7)' },
 
   body: { maxWidth: '820px', margin: '0 auto', padding: '1rem 1.5rem' },
-
-  features: { display: 'flex', flexDirection: 'column', gap: '2.75rem' },
-  hgalHint: { fontSize: '0.78rem', color: 'var(--neon-cyan)', fontFamily: 'var(--font-mono)', marginBottom: '1.1rem', textShadow: '0 0 8px #2de2e855' },
 
   tableWrap: { overflowX: 'auto', marginTop: '1.25rem', border: '1px solid #2a2a3e', borderRadius: '12px' },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', minWidth: '560px' },

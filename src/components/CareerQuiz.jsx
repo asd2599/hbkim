@@ -59,16 +59,17 @@ export default function CareerQuiz() {
   const [input, setInput] = useState('');
   const [pending, setPending] = useState(false); // AI 응답 대기
   const [openCard, setOpenCard] = useState(null); // 열린(비하인드 공개) 카드 index
+  const [solvedModal, setSolvedModal] = useState(null); // 방금 맞힌 단계 (정답 모달)
 
   const logRef = useRef(null);
 
   // 모달 열렸을 때 ESC로 닫기
   useEffect(() => {
-    if (openCard === null) return;
-    const onKey = (e) => { if (e.key === 'Escape') setOpenCard(null); };
+    if (openCard === null && solvedModal === null) return;
+    const onKey = (e) => { if (e.key === 'Escape') { setOpenCard(null); setSolvedModal(null); } };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [openCard]);
+  }, [openCard, solvedModal]);
 
   const solvedCount = solved.filter(Boolean).length;
   const remaining = TOTAL_QUESTIONS - used;
@@ -118,11 +119,13 @@ export default function CareerQuiz() {
     if (!t) return;
     setInput('');
 
-    // 정답 시도가 맞으면: 소모하되 게임 진행
+    // 정답 시도가 맞으면: 소모하되 게임 진행 + 정답 모달
     if (kind === 'guess' && isCorrect(t, stage)) {
+      const solvedIdx = current;
       setUsed((u) => u + 1);
       setLog((l) => [...l, { role: 'you', text: t }]);
       solveCurrent();
+      setSolvedModal(solvedIdx);
       return;
     }
 
@@ -246,6 +249,24 @@ export default function CareerQuiz() {
           );
         })}
       </div>
+
+      {/* ── 정답! 모달 ── */}
+      {solvedModal !== null && STAGES[solvedModal] && (
+        <div className="cq-modal-overlay" onClick={() => setSolvedModal(null)}>
+          <div className="cq-modal cq-success" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <span className="cq-success-badge arcade neon neon-green">정답! ✓</span>
+            <span className="cq-modal-company">{STAGES[solvedModal].company}</span>
+            <p className="cq-success-text">회사명을 해금했어요.<br />비하인드 스토리를 확인하세요.</p>
+            <button
+              type="button"
+              className="btn-arcade"
+              onClick={() => { setOpenCard(solvedModal); setSolvedModal(null); }}
+            >
+              비하인드 보기 →
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── 비하인드 모달 ── */}
       {openCard !== null && STAGES[openCard] && (

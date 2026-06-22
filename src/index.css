@@ -470,58 +470,86 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 /* 상세 페이지는 스냅 없이 매끄럽게 스크롤 */
 .detail-page section { scroll-snap-align: none; }
 
-/* ── 주요 기능 가로 핀(pinned) 스크롤 ── */
-.hgal { position: relative; }
-.hgal-sticky {
-  position: sticky;
-  overflow: hidden;
-  padding: 0.5rem 0;
-}
-.hgal-track {
+/* ── 주요 기능 슬라이더 (이미지 좌·설명 우, 페이지 슬라이드) ── */
+.feat-slider { position: relative; }
+.feat-viewport { overflow: hidden; border-radius: 16px; }
+.feat-track {
   display: flex;
-  align-items: center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 }
-.hgal-panel {
+.feat-slide {
   flex: 0 0 100%;
   min-width: 0;
-  padding: 0 0.4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 340px) 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding: 0.5rem;
 }
+
+/* 이미지 프레임 (왼쪽 고정) */
+.feat-figure {
+  position: relative;
+  margin: 0;
+  padding: 8px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #2de2e633, #646cff22 55%, transparent);
+  border: 1px solid #2de2e644;
+  box-shadow: 0 18px 50px -22px rgba(0, 0, 0, 0.75), 0 0 0 1px #2de2e618 inset;
+}
+.feat-figure img {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  border: 1px solid var(--border-2);
+  background: #0b0b13;
+}
+.feat-info { display: flex; flex-direction: column; gap: 0.55rem; }
+
+/* 내비게이션 (화살표 · 점 · 카운터) */
+.feat-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+.feat-arrow {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid #2de2e655;
+  background: var(--surface);
+  color: var(--neon-cyan);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.feat-arrow:hover { background: #2de2e618; box-shadow: 0 0 16px -4px var(--neon-cyan); transform: translateY(-1px); }
+.feat-dots { display: flex; gap: 0.5rem; }
+.feat-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff22;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.feat-dot:hover { background: #ffffff55; }
+.feat-dot.on { background: var(--neon-cyan); box-shadow: 0 0 8px var(--neon-cyan); transform: scale(1.25); }
+.feat-count { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-mute); min-width: 3.2rem; text-align: center; }
 
 /* ── Project 아이콘 (project-icons.svg) ── */
 .proj-icon { width: 2rem; height: 2rem; display: block; flex-shrink: 0; }
 .proj-icon-lg { width: 2.6rem; height: 2.6rem; display: block; flex-shrink: 0; filter: drop-shadow(0 0 10px currentColor); }
 .proj-icon-sm { width: 1.2rem; height: 1.2rem; flex-shrink: 0; }
 
-/* ── Project 주석(동그라미+설명) 쇼케이스 ── */
-.ann-feature {
-  display: grid;
-  grid-template-columns: minmax(0, 300px) 1fr;
-  gap: 1.9rem;
-  align-items: center;
-}
-.ann-feature.rev { grid-template-columns: 1fr minmax(0, 300px); }
-.ann-feature.rev .ann-figure { order: 2; transform: translateX(40px) scale(0.97); }
-.ann-feature.rev .ann-info { order: 1; }
-
-/* 가로(데스크톱) 스크린샷: 이미지 전체폭 위 + 설명 아래 */
-.ann-feature.wide { display: block; }
-.ann-feature.wide .ann-figure { transform: translateY(40px) scale(0.98); margin-bottom: 1.25rem; }
-.ann-feature.wide .ann-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.6rem 1.4rem; }
-
-.ann-figure {
-  position: relative;
-  margin: 0;
-  border-radius: 22px;
-  overflow: hidden;
-  border: 1px solid var(--border-2);
-  background: #0b0b13;
-  box-shadow: var(--shadow-soft);
-  opacity: 0;
-  transform: translateX(-40px) scale(0.97);
-  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.ann-feature.in .ann-figure { opacity: 1; transform: none; }
+/* ── 기능 콘텐츠 (이미지 위 번호 동그라미 + 설명) — 활성 슬라이드에서 등장 ── */
 .ann-figure img { width: 100%; display: block; }
 
 /* 화면 위 번호 동그라미 */
@@ -541,9 +569,9 @@ h1, h2, h3 { letter-spacing: -0.02em; }
   box-shadow: 0 0 0 4px #2de2e655, 0 0 14px #2de2e6;
   z-index: 2;
   transition: transform 0.45s cubic-bezier(0.34, 1.7, 0.5, 1);
-  transition-delay: calc(0.45s + var(--i) * 0.28s);
+  transition-delay: calc(var(--i) * 0.16s);
 }
-.ann-feature.in .ann-ring { transform: translate(-50%, -50%) scale(1); }
+.feat-slide.active .ann-ring { transform: translate(-50%, -50%) scale(1); }
 .ann-ring::after {
   content: '';
   position: absolute;
@@ -552,16 +580,15 @@ h1, h2, h3 { letter-spacing: -0.02em; }
   border: 2px solid var(--neon-cyan);
   opacity: 0;
 }
-.ann-feature.in .ann-ring::after {
+.feat-slide.active .ann-ring::after {
   animation: annPing 1.7s ease-out infinite;
-  animation-delay: calc(0.9s + var(--i) * 0.28s);
+  animation-delay: calc(0.5s + var(--i) * 0.16s);
 }
 @keyframes annPing {
   0% { transform: scale(0.7); opacity: 0.85; }
   100% { transform: scale(1.9); opacity: 0; }
 }
 
-.ann-info { display: flex; flex-direction: column; gap: 0.5rem; }
 .ann-eyebrow { font-size: 0.55rem; letter-spacing: 0.1em; color: var(--neon-cyan); text-shadow: 0 0 8px #2de2e688; }
 .ann-title { font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
 .ann-caption { font-size: 0.9rem; color: #aaa; line-height: 1.7; }
@@ -576,9 +603,9 @@ h1, h2, h3 { letter-spacing: -0.02em; }
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.5s ease, transform 0.5s ease;
-  transition-delay: calc(0.55s + var(--i) * 0.28s);
+  transition-delay: calc(0.2s + var(--i) * 0.1s);
 }
-.ann-feature.in .ann-li { opacity: 1; transform: none; }
+.feat-slide.active .ann-li { opacity: 1; transform: none; }
 .ann-num {
   flex-shrink: 0;
   width: 22px;
@@ -593,10 +620,13 @@ h1, h2, h3 { letter-spacing: -0.02em; }
   box-shadow: 0 0 10px -2px var(--neon-cyan);
 }
 @media (max-width: 700px) {
-  .ann-feature, .ann-feature.rev { grid-template-columns: 1fr; gap: 1.1rem; }
-  .ann-feature .ann-figure, .ann-feature.rev .ann-figure { order: 0; max-width: 300px; margin: 0 auto; transform: translateY(30px) scale(0.97); }
-  .ann-feature.in .ann-figure { transform: none; }
-  .ann-feature.rev .ann-info { order: 0; }
+  .feat-slide { grid-template-columns: 1fr; gap: 1.1rem; }
+  .feat-figure { max-width: 340px; margin: 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feat-track { transition: none; }
+  .ann-ring, .ann-li { transition: none; }
+  .feat-slide.active .ann-ring::after { animation: none; }
 }
 
 /* ── 시연 영상 임베드 (반응형 16:9) ── */
@@ -1176,138 +1206,6 @@ body::after {
 .chatbot-input .btn-arcade { font-size: 0.6rem; padding: 0 1rem; display: inline-flex; align-items: center; }
 .chatbot-input .btn-arcade:disabled { opacity: 0.45; cursor: default; box-shadow: 0 0 0 2px #05050b, 2px 2px 0 0 #11707a; }
 
-/* ════════════════════════════════════════════
-   스킬 로봇 합체 스테이지
-════════════════════════════════════════════ */
-.mech-stage {
-  position: relative;
-  width: 100%;
-  height: 380px;
-  overflow: hidden;
-  border-radius: var(--r-md);
-  background:
-    radial-gradient(circle at 50% 42%, #1a1140 0%, transparent 58%),
-    linear-gradient(180deg, #070711 0%, #05050b 100%);
-  border: 1px solid #2de2e633;
-  box-shadow: 0 0 28px -14px #2de2e644, var(--shadow-soft);
-}
-@media (max-width: 560px) { .mech-stage { height: 320px; } }
-
-/* 합체 골격(프레임) */
-.mech-frame {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 0.7s ease;
-  pointer-events: none;
-}
-.mech-frame.on { opacity: 0.5; }
-.mech-frame line,
-.mech-frame polyline {
-  fill: none;
-  stroke: var(--neon-cyan);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 3px var(--neon-cyan));
-}
-
-/* 합체 코어 글로우 */
-.mech-core-glow {
-  position: absolute;
-  left: 50%;
-  top: 42%;
-  width: 200px;
-  height: 200px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle, #2de2e655 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.7s ease;
-  pointer-events: none;
-}
-.mech-core-glow.on { opacity: 1; }
-
-/* 파츠 */
-.mech-part {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  opacity: 0.55;
-  z-index: 1;
-  /* 흩어질 때: 부드럽게 */
-  transition:
-    left 0.6s ease,
-    top 0.6s ease,
-    transform 0.6s ease,
-    opacity 0.45s ease;
-}
-/* 도킹될 때: 살짝 오버슈트로 "이잉 → 캉" 하고 박힘 */
-.mech-part.docked {
-  opacity: 1;
-  z-index: 2;
-  transition:
-    left 0.4s cubic-bezier(0.34, 1.7, 0.5, 1),
-    top 0.4s cubic-bezier(0.34, 1.7, 0.5, 1),
-    transform 0.4s cubic-bezier(0.34, 1.7, 0.5, 1),
-    opacity 0.2s ease;
-}
-.mech-icon {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  background: #0b0e16;
-  border: 1px solid currentColor;
-  box-shadow: 0 0 10px -3px currentColor;
-}
-.mech-part.docked .mech-icon {
-  box-shadow: 0 0 16px -3px currentColor, inset 0 0 12px -6px currentColor;
-  animation: dockClank 0.42s ease;
-}
-/* "캉" 충격 링 */
-.mech-icon::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 12px;
-  border: 2px solid currentColor;
-  opacity: 0;
-  pointer-events: none;
-}
-.mech-part.docked .mech-icon::after { animation: dockRing 0.5s ease; }
-@keyframes dockClank {
-  0%   { transform: scale(1.32); filter: brightness(2.4); }
-  50%  { transform: scale(0.9); }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-@keyframes dockRing {
-  0%   { opacity: 0.9; transform: scale(0.55); }
-  100% { opacity: 0; transform: scale(1.8); }
-}
-.mech-label {
-  position: absolute;
-  top: 100%;
-  margin-top: 3px;
-  font-size: 0.58rem;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  text-shadow: 0 1px 3px #000;
-  pointer-events: none;
-}
-.mech-part:hover { z-index: 5; }
-.mech-part:hover .mech-label { opacity: 1; }
-
 /* ────────────────────────────────────────────
    경력 AI 스무고개 (CareerQuiz)
 ──────────────────────────────────────────── */
@@ -1475,10 +1373,245 @@ body::after {
 .cq-modal-meta { display: block; font-size: 0.76rem; color: var(--accent-2); font-family: var(--font-mono); margin-top: 0.25rem; }
 .cq-modal-behind { font-size: 0.92rem; color: var(--text-dim); line-height: 1.85; margin: 1.1rem 0 0; }
 
+/* 정답! 모달 */
+.cq-success { text-align: center; }
+.cq-success-badge { display: block; font-size: 0.95rem; margin-bottom: 0.7rem; }
+.cq-success .cq-modal-company { display: block; }
+.cq-success-text { font-size: 0.9rem; color: var(--text-dim); line-height: 1.7; margin: 0.6rem 0 1.3rem; }
+
 @keyframes cqFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes cqPop { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   .cq-modal-overlay, .cq-modal { animation: none; }
   .cq-card.unlocked:hover { transform: none; }
+}
+
+/* ────────────────────────────────────────────
+   기술 스택 사천성 (Skills)
+──────────────────────────────────────────── */
+.ss-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+.ss-toolbar .spacer { flex: 1; }
+.ss-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.ss-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+.ss-btn:disabled { opacity: 0.4; cursor: default; }
+
+.ss-board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border-radius: var(--r-md);
+  border: 1px solid #2de2e633;
+  background:
+    radial-gradient(circle at 50% 120%, #1a1140 0%, transparent 60%),
+    linear-gradient(180deg, #070711 0%, #05050b 100%);
+  box-shadow: 0 0 30px -14px #2de2e644, var(--shadow-soft);
+}
+.ss-cell.empty { aspect-ratio: 1 / 1; }
+
+/* 보상 사진 — 타일 뒤에 흐릿하게(블러). 타일이 사라진 칸으로 비쳐 보인다. */
+.ss-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.ss-photo::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  background-image: var(--photo);
+  background-size: cover;
+  background-position: center;
+  filter: blur(12px) brightness(0.48) saturate(0.9);
+}
+
+.ss-tile {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #15151f 0%, #0e0e16 100%);
+  color: var(--cls, var(--neon-cyan));
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+}
+.ss-tile .skill-svg { width: 54%; height: 54%; }
+.ss-tile:hover { transform: translateY(-2px); border-color: var(--cls); }
+.ss-tile.sel {
+  border-color: var(--cls);
+  box-shadow: 0 0 0 2px var(--cls), 0 0 16px -2px var(--cls);
+  transform: translateY(-2px);
+}
+.ss-tile.hint { animation: ssHint 0.65s ease-in-out 2; }
+.ss-tile.bad { animation: ssBad 0.32s; }
+@keyframes ssHint {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50% { box-shadow: 0 0 0 2px var(--neon-yellow), 0 0 14px 0 var(--neon-yellow); }
+}
+@keyframes ssBad {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* 매칭 시 사라지는 타일 (팡 터지는 연출) */
+.ss-tile.matching {
+  z-index: 3;
+  animation: ssMatch 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes ssMatch {
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 var(--cls); }
+  35%  { transform: scale(1.16); border-color: var(--cls); box-shadow: 0 0 0 3px var(--cls), 0 0 24px 3px var(--cls); }
+  100% { transform: scale(0.35); opacity: 0; }
+}
+
+/* 연결선 (꺾인 경로가 그려졌다 사라짐) */
+.ss-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+  overflow: visible;
+}
+.ss-path polyline {
+  fill: none;
+  stroke: var(--neon-cyan);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px var(--neon-cyan)) drop-shadow(0 0 10px #2de2e6aa);
+  animation: ssPath 0.38s ease forwards;
+}
+@keyframes ssPath {
+  0%   { opacity: 0; }
+  25%  { opacity: 1; }
+  65%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.ss-win {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  border-radius: var(--r-md);
+  background: rgba(5, 5, 11, 0.82);
+  backdrop-filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-tile, .ss-tile.hint, .ss-tile.bad { transition: none; animation: none; }
+  .ss-tile.matching { animation: none; opacity: 0; }
+  .ss-path { display: none; }
+}
+
+/* 매칭한 스킬 슬롯 복제본이 중앙(2배) → 아래 슬롯(1배)으로 날아가 박힘 */
+.ss-flyer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9990;
+  pointer-events: none;
+  transform-origin: 0 0;
+  transition: transform 0.56s cubic-bezier(0.45, 0, 0.2, 1);
+  filter: drop-shadow(0 0 16px var(--cls)) drop-shadow(0 0 6px var(--cls));
+}
+.ss-flyer .eq-slot { width: 100%; height: 100%; margin: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .ss-flyer { display: none; }
+}
+
+/* 인트로(설명 + START) */
+.ss-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.6rem 1.5rem 1.8rem;
+  border-radius: var(--r-md);
+  border: 1px solid #2de2e633;
+  background: linear-gradient(180deg, #0a0e18 0%, #06060d 100%);
+}
+.ss-intro-title { font-size: 0.85rem; margin-bottom: 0.5rem; }
+
+/* 클리어 보상 모달 (사진 선명하게) */
+.ss-reward-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(3, 3, 8, 0.78);
+  backdrop-filter: blur(3px);
+  animation: cqFade 0.2s ease;
+}
+.ss-reward {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  padding: 1.4rem;
+  border-radius: var(--r-md);
+  border: 1px solid #2de2e655;
+  background: linear-gradient(180deg, #0d1320 0%, #08080f 100%);
+  box-shadow: 0 24px 70px -20px rgba(0, 0, 0, 0.85);
+  text-align: center;
+  animation: cqPop 0.25s ease;
+}
+.ss-reward img {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #2de2e633;
+}
+.ss-reward-badge { display: block; font-size: 0.8rem; margin-bottom: 0.85rem; }
+.ss-reward-cap { font-size: 0.9rem; color: var(--text-dim); margin: 0.9rem 0 0; }
+.ss-reward-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.65rem;
+  width: 2rem;
+  height: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-mute);
+  font-size: 1.1rem;
+  line-height: 1;
+  z-index: 1;
+}
+.ss-reward-close:hover { color: var(--text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-reward-overlay, .ss-reward { animation: none; }
 }
