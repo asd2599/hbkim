@@ -38,7 +38,7 @@ export default function Projects() {
         title="프로젝트"
         subtitle="문제 정의부터 배포·운영까지 직접 만든 AI 풀스택 서비스들. 카드를 눌러 상세 과정을 확인하세요."
       />
-      <div style={styles.grid}>
+      <div className="projects-grid">
         {projects.map((p, i) => (
           <ProjectCard key={p.slug} project={p} delay={i * 150} index={i} />
         ))}
@@ -51,7 +51,6 @@ export default function Projects() {
 const styles = {
   section: { padding: '6rem 2rem', maxWidth: '1000px', margin: '0 auto' },
   heading: { fontSize: '2rem', color: '#fff', marginBottom: '0.75rem' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' },
   stage: { fontSize: '0.55rem', color: 'var(--neon-cyan)', letterSpacing: '0.08em', textShadow: '0 0 8px #2de2e688' },
   cardHeader: { display: 'flex', alignItems: 'flex-start', gap: '1rem' },
   emoji: { fontSize: '2rem', lineHeight: 1 },

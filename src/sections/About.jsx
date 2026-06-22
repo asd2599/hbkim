@@ -1,6 +1,6 @@
 import useScrollAnimation from '../hooks/useScrollAnimation';
 import SectionHeading from '../components/SectionHeading';
-import CareerQuest from '../components/CareerQuest';
+import CareerQuiz from '../components/CareerQuiz';
 import SectionNext from '../components/SectionNext';
 import { profile } from '../data/profile';
 
@@ -12,14 +12,14 @@ export default function About() {
       <SectionHeading
         eyebrow="About"
         title="소개"
-        subtitle="첫 경력부터 차근차근 — 게임 개발·교육 10년의 퀘스트를 깨고 AI 풀스택에 도달했습니다."
+        subtitle="AI 스무고개로 경력을 해금하세요 — 핵심 단어를 맞히면 회사명과 비하인드 스토리가 열립니다."
       />
 
       <p ref={summaryRef} style={styles.summary}>
         {profile.summary}
       </p>
 
-      <CareerQuest />
+      <CareerQuiz />
       <SectionNext to="skills" />
     </section>
   );
