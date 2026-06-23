@@ -28,6 +28,11 @@
   --shadow-card: 0 18px 50px -20px rgba(0, 0, 0, 0.7);
   --shadow-glow: 0 22px 60px -18px #646cff3a;
 
+  /* custom cursors (public/cursor*.png) — 핫스팟은 화살표 끝(좌상단) */
+  --cur:         url('/cursor.png') 3 2, auto;
+  --cur-pointer: url('/cursor-pointer.png') 3 2, pointer;
+  --cur-default: url('/cursor.png') 3 2, default;
+
   /* type */
   --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
@@ -51,6 +56,20 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  cursor: var(--cur);
+}
+
+/* 커스텀 커서 (public/cursor*.png) — 클릭 가능 요소는 포인터 화살표 */
+a, button, [role="button"], label, summary {
+  cursor: var(--cur-pointer);
+}
+/* 텍스트 입력은 기본 I-beam 유지 */
+input, textarea, select, [contenteditable="true"] {
+  cursor: auto;
+}
+/* 비활성 버튼은 기본 커서 */
+button:disabled {
+  cursor: var(--cur-default);
 }
 
 /* 은은한 그리드 오버레이 */
@@ -87,9 +106,9 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .main-content {
   position: relative;
   z-index: 1;
-  margin-left: 220px;
-  padding-right: 56px;   /* SectionNav 도트 공간 */
 }
+/* 앵커 스크롤 시 떠 있는 pill 네비 아래로 정렬 */
+.main-content section { scroll-margin-top: 80px; }
 
 /* ── Sidebar (desktop) ── */
 .sidebar {
@@ -525,7 +544,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
   background: var(--surface);
   color: var(--neon-cyan);
   font-size: 1rem;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
 }
 .feat-arrow:hover { background: #2de2e618; box-shadow: 0 0 16px -4px var(--neon-cyan); transform: translateY(-1px); }
@@ -537,7 +556,7 @@ h1, h2, h3 { letter-spacing: -0.02em; }
   border: none;
   border-radius: 50%;
   background: #ffffff22;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   transition: background 0.2s, transform 0.2s;
 }
 .feat-dot:hover { background: #ffffff55; }
@@ -699,18 +718,6 @@ h1, h2, h3 { letter-spacing: -0.02em; }
    Mobile  (< 900px)
 ════════════════════════════ */
 @media (max-width: 900px) {
-  .sidebar      { display: none; }
-  .mobile-header { display: flex; }
-
-  .main-content {
-    margin-left: 0;
-    padding-right: 0;
-    padding-top: 56px;   /* mobile header height */
-  }
-
-  /* 우측 섹션 도트 숨김 */
-  .section-nav { display: none; }
-
   .profile-img {
     width: 160px;
     height: 160px;
@@ -909,7 +916,7 @@ body::after {
   box-shadow: 0 0 0 2px #05050b, 0 0 16px -2px var(--neon-cyan), 4px 4px 0 0 #11707a;
   transition: transform 0.12s, box-shadow 0.12s;
   display: inline-block;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
 }
 .btn-arcade:hover { transform: translate(-1px, -1px); box-shadow: 0 0 0 2px #05050b, 0 0 22px 0 var(--neon-cyan), 6px 6px 0 0 #11707a; }
 .btn-arcade:active { transform: translate(3px, 3px); box-shadow: 0 0 0 2px #05050b, 1px 1px 0 0 #11707a; }
@@ -957,12 +964,12 @@ body::after {
   border: 1px solid #ff4d8d66;
   border-radius: 4px;
   padding: 0.4rem 0.6rem;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   letter-spacing: 0.06em;
   transition: background 0.15s, box-shadow 0.15s;
 }
 .inv2-reset:hover { background: #ff4d8d18; box-shadow: 0 0 12px -3px var(--neon-pink); }
-.inv2-reset:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
+.inv2-reset:disabled { opacity: 0.4; cursor: var(--cur-default); box-shadow: none; }
 
 /* 3개 클래스 카드 */
 .inv-classes {
@@ -1189,11 +1196,11 @@ body::after {
   border: 1px solid #2de2e644;
   border-radius: 999px;
   padding: 0.35rem 0.75rem;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.15s;
 }
 .chat-chip:hover:not(:disabled) { border-color: var(--neon-cyan); color: #fff; transform: translateY(-2px); }
-.chat-chip:disabled { opacity: 0.5; cursor: default; }
+.chat-chip:disabled { opacity: 0.5; cursor: var(--cur-default); }
 
 /* 입력 */
 .chatbot-input {
@@ -1204,7 +1211,7 @@ body::after {
 }
 .chatbot-input .form-input { flex: 1; }
 .chatbot-input .btn-arcade { font-size: 0.6rem; padding: 0 1rem; display: inline-flex; align-items: center; }
-.chatbot-input .btn-arcade:disabled { opacity: 0.45; cursor: default; box-shadow: 0 0 0 2px #05050b, 2px 2px 0 0 #11707a; }
+.chatbot-input .btn-arcade:disabled { opacity: 0.45; cursor: var(--cur-default); box-shadow: 0 0 0 2px #05050b, 2px 2px 0 0 #11707a; }
 
 /* ────────────────────────────────────────────
    경력 AI 스무고개 (CareerQuiz)
@@ -1265,7 +1272,7 @@ body::after {
 .cq-controls .form-input { flex: 1; min-width: 180px; }
 .cq-btns { display: flex; gap: 0.5rem; }
 .cq-btns .btn-arcade { font-size: 0.6rem; padding: 0 1rem; display: inline-flex; align-items: center; }
-.cq-btns .btn-arcade:disabled { opacity: 0.45; cursor: default; box-shadow: 0 0 0 2px #05050b, 2px 2px 0 0 #11707a; }
+.cq-btns .btn-arcade:disabled { opacity: 0.45; cursor: var(--cur-default); box-shadow: 0 0 0 2px #05050b, 2px 2px 0 0 #11707a; }
 
 .cq-hint-more {
   margin-top: 0.7rem;
@@ -1273,7 +1280,7 @@ body::after {
   color: var(--neon-yellow);
   background: none;
   border: none;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   padding: 0;
 }
 .cq-hint-more:hover { text-decoration: underline; }
@@ -1295,11 +1302,11 @@ body::after {
   border-radius: var(--r-md);
   border: 1px solid var(--border);
   background: var(--surface);
-  cursor: default;
+  cursor: var(--cur-default);
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 .cq-card.locked { border-style: dashed; opacity: 0.9; }
-.cq-card.unlocked { cursor: pointer; border-color: #646cff55; }
+.cq-card.unlocked { cursor: var(--cur-pointer); border-color: #646cff55; }
 .cq-card.unlocked:hover { border-color: var(--accent); box-shadow: var(--shadow-glow); transform: translateY(-2px); }
 
 .cq-card-stage {
@@ -1363,7 +1370,7 @@ body::after {
   height: 2rem;
   background: none;
   border: none;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   color: var(--text-mute);
   font-size: 1.1rem;
   line-height: 1;
@@ -1406,11 +1413,11 @@ body::after {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.35rem 0.75rem;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   transition: border-color 0.15s, color 0.15s;
 }
 .ss-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
-.ss-btn:disabled { opacity: 0.4; cursor: default; }
+.ss-btn:disabled { opacity: 0.4; cursor: var(--cur-default); }
 
 .ss-board {
   position: relative;
@@ -1456,7 +1463,7 @@ body::after {
   border: 1px solid var(--border);
   background: linear-gradient(180deg, #15151f 0%, #0e0e16 100%);
   color: var(--cls, var(--neon-cyan));
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
 }
 .ss-tile .skill-svg { width: 54%; height: 54%; }
@@ -1604,7 +1611,7 @@ body::after {
   height: 2rem;
   background: none;
   border: none;
-  cursor: pointer;
+  cursor: var(--cur-pointer);
   color: var(--text-mute);
   font-size: 1.1rem;
   line-height: 1;
@@ -1614,4 +1621,125 @@ body::after {
 
 @media (prefers-reduced-motion: reduce) {
   .ss-reward-overlay, .ss-reward { animation: none; }
+}
+
+/* ════════════════════════════════════════════
+   TEACHING LAYER — 강사 전용 포트폴리오 (/teaching)
+   차분한 블루 톤. 토큰만 덮어써 공유 클래스(.eyebrow·.section-title·
+   .section-divider·.project-card·.btn-* 등)가 자동으로 블루로 리테마됨.
+════════════════════════════════════════════ */
+.teaching-root {
+  --bg:        #0d1522;
+  --surface:   #141f30;
+  --surface-2: #1a2740;
+  --border:    #243246;
+  --border-2:  #2f4159;
+
+  --text:      #e6ecf5;
+  --text-dim:  #9fb0c5;
+  --text-mute: #6d7e94;
+  --text-faint:#4a5b73;
+
+  --accent:      #3b82f6;
+  --accent-2:    #60a5fa;
+  --accent-soft: #3b82f614;
+
+  --shadow-glow: 0 22px 60px -18px #3b82f63a;
+}
+
+/* 강사 페이지 동안 body: 배경 교체 + 아케이드 레이어(그리드·CRT 스캔라인) 제거 */
+body.teaching-mode { background: #0d1522; }
+body.teaching-mode::before,
+body.teaching-mode::after { display: none; }
+body.teaching-mode ::selection { background: #3b82f655; color: #fff; }
+
+/* project-card 의 상단 hover 라인도 블루로 */
+.teaching-root .project-card:hover { border-color: #3b82f666; }
+
+/* 반응형 2열 그리드 (Philosophy·Curriculum) — 900px 이하 1열 */
+.t-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+@media (max-width: 900px) {
+  .t-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ════════════════════════════════════════════
+   떠 있는 타원형(pill) 아이콘 네비 — 홈·강사 공용
+   색상은 var(--accent) 토큰을 따름(.teaching-root 에서 자동 블루 리테마).
+════════════════════════════════════════════ */
+.pillnav {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(12, 12, 20, 0.72);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.7);
+}
+.pillnav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: var(--cur-pointer);
+  color: var(--text-mute);
+  transition: color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.pillnav-btn { position: relative; }
+.pillnav-btn:hover { color: var(--text); background: var(--accent-soft); transform: translateY(-1px); }
+.pillnav-btn.active { color: #fff; background: var(--accent); box-shadow: 0 0 16px -3px var(--accent); }
+.pillnav-icon { width: 21px; height: 21px; display: block; }
+
+/* 호버 시 아래로 뜨는 라벨 툴팁 */
+.pillnav-tip {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  padding: 0.3rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--text);
+  background: rgba(10, 10, 18, 0.96);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px -8px rgba(0, 0, 0, 0.75);
+  opacity: 0;
+  transform: translateX(-50%) translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.18s, transform 0.18s;
+}
+.pillnav-tip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: rgba(10, 10, 18, 0.96);
+}
+.pillnav-btn:hover .pillnav-tip,
+.pillnav-btn:focus-visible .pillnav-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 480px) {
+  .pillnav { gap: 0.1rem; padding: 0.35rem 0.4rem; }
+  .pillnav-btn { width: 42px; height: 42px; }
 }

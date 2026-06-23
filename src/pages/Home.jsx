@@ -1,6 +1,5 @@
-import Sidebar from '../components/Sidebar';
-import MobileHeader from '../components/MobileHeader';
-import SectionNav from '../components/SectionNav';
+import IconPillNav from '../components/IconPillNav';
+import { homeNav } from '../components/homeNav';
 import Hero from '../sections/Hero';
 import About from '../sections/About';
 import Skills from '../sections/Skills';
@@ -10,9 +9,7 @@ import Contact from '../sections/Contact';
 export default function Home() {
   return (
     <>
-      <Sidebar />
-      <MobileHeader />
-      <SectionNav />
+      <IconPillNav items={homeNav} />
       <main className="main-content">
         <Hero />
         <About />
