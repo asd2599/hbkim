@@ -6,20 +6,24 @@ import { useEffect, useRef, useState } from 'react';
    - "김현복에 대해" 편하게 물어볼 수 있는 AI 비서
 ──────────────────────────────────────────── */
 
-const GREETING = {
-  role: 'assistant',
-  content: '저는 김현봇입니다. 김현복님의 경력·프로젝트·기술·성향 등 궁금한 걸 편하게 물어보세요!',
-};
+const DEFAULT_GREETING =
+  '저는 김현봇입니다. 김현복님의 경력·프로젝트·기술·성향 등 궁금한 걸 편하게 물어보세요!';
 
-const SUGGESTIONS = [
+const DEFAULT_SUGGESTIONS = [
   '대표 프로젝트가 뭔가요?',
   '게임 개발에서 왜 AI로 전향했나요?',
   '본인의 강점은?',
   '어떤 기술 스택을 쓰나요?',
 ];
 
-export default function Chatbot() {
-  const [msgs, setMsgs] = useState([GREETING]);
+export default function Chatbot({
+  greeting = DEFAULT_GREETING,
+  suggestions = DEFAULT_SUGGESTIONS,
+  title = '김현봇',
+  subtitle = 'AI · RAG 챗봇',
+  placeholder = '김현복님께 궁금하신 게 있으면 물어보세요',
+} = {}) {
+  const [msgs, setMsgs] = useState([{ role: 'assistant', content: greeting }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
@@ -77,8 +81,8 @@ export default function Chatbot() {
           <img src="/avatar-bot.svg" alt="" />
           <span className="chatbot-dot" />
         </span>
-        <span className="arcade" style={st.title}>김현봇</span>
-        <span style={st.sub}>AI · RAG 챗봇</span>
+        <span className="arcade chatbot-title">{title}</span>
+        <span style={st.sub}>{subtitle}</span>
       </div>
 
       <div className="chatbot-log" ref={scrollRef}>
@@ -100,7 +104,7 @@ export default function Chatbot() {
 
       {msgs.length <= 1 && (
         <div className="chat-suggest">
-          {SUGGESTIONS.map((s) => (
+          {suggestions.map((s) => (
             <button key={s} type="button" className="chat-chip" onClick={() => ask(s)} disabled={loading}>
               {s}
             </button>
@@ -113,7 +117,7 @@ export default function Chatbot() {
           className="form-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="김현복님께 궁금하신 게 있으면 물어보세요"
+          placeholder={placeholder}
           maxLength={500}
           aria-label="질문 입력"
         />
@@ -126,6 +130,5 @@ export default function Chatbot() {
 }
 
 const st = {
-  title: { fontSize: '0.62rem', color: 'var(--neon-cyan)', letterSpacing: '0.08em' },
   sub: { fontSize: '0.62rem', color: 'var(--text-mute)', marginLeft: 'auto', fontFamily: 'var(--font-mono)' },
 };

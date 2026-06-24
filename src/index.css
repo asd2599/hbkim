@@ -1107,6 +1107,7 @@ body::after {
   padding: 0.8rem 1rem;
   border-bottom: 1px solid #2de2e622;
 }
+.chatbot-title { font-size: 0.62rem; color: var(--neon-cyan); letter-spacing: 0.08em; }
 .chatbot-head-ava {
   position: relative;
   width: 30px;
@@ -1742,4 +1743,48 @@ body.teaching-mode ::selection { background: #3b82f655; color: #fff; }
 @media (max-width: 480px) {
   .pillnav { gap: 0.1rem; padding: 0.35rem 0.4rem; }
   .pillnav-btn { width: 42px; height: 42px; }
+}
+
+/* ── 강사 페이지 챗봇 — 아케이드 네온 → 차분한 블루 리테마 ── */
+.teaching-root .hud-frame {
+  border-color: var(--border);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  box-shadow: var(--shadow-soft);
+}
+.teaching-root .chatbot-head { border-bottom-color: var(--border); }
+.teaching-root .chatbot-title { color: var(--accent); }
+.teaching-root .chatbot-dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.teaching-root .chatbot-log::-webkit-scrollbar-thumb { background: #3b82f644; }
+.teaching-root .chat-bubble.assistant { background: #0f1a2b; border-color: var(--border); color: var(--text-dim); }
+.teaching-root .chat-bubble.user { background: var(--accent-soft); border-color: #3b82f566; color: var(--text); }
+.teaching-root .typing i { background: var(--accent); }
+.teaching-root .chatbot-input { border-top-color: var(--border); }
+.teaching-root .chat-chip { border-color: #3b82f544; }
+.teaching-root .chat-chip:hover:not(:disabled) { border-color: var(--accent); }
+/* SEND 버튼: 아케이드 픽셀 → 차분한 블루 */
+.teaching-root .chatbot-input .btn-arcade {
+  font-family: var(--font-mono);
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--r-sm);
+  box-shadow: none;
+}
+.teaching-root .chatbot-input .btn-arcade:hover { background: #2f6fe0; box-shadow: none; transform: none; }
+.teaching-root .chatbot-input .btn-arcade:active { transform: none; box-shadow: none; }
+.teaching-root .chatbot-input .btn-arcade:disabled { box-shadow: none; }
+
+/* 강사 Hero: 소개 + 챗봇 한 화면(데스크탑 2단, 모바일 세로) */
+.teach-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  width: 100%;
+  align-items: center;
+}
+.teach-hero-chat { width: 100%; min-width: 0; }
+@media (min-width: 900px) {
+  .teach-hero-grid {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 3rem;
+  }
 }

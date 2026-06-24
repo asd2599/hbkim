@@ -15,10 +15,11 @@ export default function TeachContact() {
       <SectionHeading
         eyebrow="Contact"
         title="강의 문의"
-        subtitle="강의·특강·커리큘럼 협업 제안을 환영합니다."
+        subtitle="강의·특강·커리큘럼 협업 제안을 환영합니다. 바로 연락 주세요."
       />
 
-      <div ref={ref} style={styles.list}>
+      <div ref={ref} style={styles.wrap}>
+        <div style={styles.list}>
         {items.map((it) => (
           <a
             key={it.label}
@@ -32,6 +33,7 @@ export default function TeachContact() {
             <span className="ct-arrow">▶</span>
           </a>
         ))}
+        </div>
       </div>
 
       <div className="section-next-wrap">
@@ -45,5 +47,6 @@ export default function TeachContact() {
 
 const styles = {
   section: { padding: '6rem 2rem 8rem', maxWidth: '900px', margin: '0 auto' },
+  wrap: { display: 'flex', flexDirection: 'column', gap: '1.5rem' },
   list: { display: 'flex', flexDirection: 'column', gap: '0.75rem' },
 };
