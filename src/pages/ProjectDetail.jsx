@@ -1,10 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getProject, projects } from '../data/projects';
 
 export default function ProjectDetail() {
   const { slug } = useParams();
   const project = getProject(slug);
+
+  // 숨김 전용 포트폴리오(/portfolio)의 하위 페이지: 검색엔진 비노출(noindex) + 탭 타이틀을 프로젝트명으로 교체.
+  useEffect(() => {
+    const prevTitle = document.title;
+    document.title = project ? `${project.title} · 김현복` : '김현복 · AI Service Engineer';
+
+    const meta = document.createElement('meta');
+    meta.name = 'robots';
+    meta.content = 'noindex, nofollow';
+    document.head.appendChild(meta);
+
+    return () => {
+      document.title = prevTitle;
+      document.head.removeChild(meta);
+    };
+  }, [project]);
 
   // 잘못된 slug — 빈 상태 처리
   if (!project) {
@@ -13,7 +29,7 @@ export default function ProjectDetail() {
         <p style={{ fontSize: '3rem' }}>🔍</p>
         <h1 style={{ color: '#fff', marginBottom: '0.5rem' }}>프로젝트를 찾을 수 없습니다</h1>
         <p style={{ color: '#888', marginBottom: '1.5rem' }}>요청한 포트폴리오가 존재하지 않습니다.</p>
-        <Link to="/" className="btn-primary">홈으로</Link>
+        <Link to="/portfolio" className="btn-primary">홈으로</Link>
       </main>
     );
   }
@@ -25,7 +41,7 @@ export default function ProjectDetail() {
     <main className="detail-page">
       {/* 상단 바 */}
       <div style={S.topbar}>
-        <Link to="/" className="detail-back">← 포트폴리오</Link>
+        <Link to="/portfolio" className="detail-back">← 포트폴리오</Link>
       </div>
 
       {/* 헤더 */}

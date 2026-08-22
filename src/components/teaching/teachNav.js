@@ -4,7 +4,8 @@
 export const teachNav = [
   { id: 't-hero',     label: 'Intro',      icon: 'nav-home' },
   { id: 'philosophy', label: 'Philosophy', icon: 'nav-about' },
-  { id: 'history',    label: 'History',    icon: 'nav-portfolio' },
-  { id: 'curriculum', label: 'Curriculum', icon: 'nav-skills' },
+  { id: 'history',    label: 'Quest Log',  icon: 'nav-portfolio' },
+  { id: 'curriculum', label: 'Skill Tree', icon: 'nav-tree' },
+  { id: 'arcade',     label: 'Bonus',      icon: 'nav-skills' },
   { id: 't-contact',  label: 'Contact',    icon: 'nav-contact' },
 ];

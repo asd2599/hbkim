@@ -1,46 +1,121 @@
+import { useEffect, useRef, useState } from 'react';
 import useScrollAnimation from '../../hooks/useScrollAnimation';
 import SectionHeading from '../../components/SectionHeading';
 import SectionNext from '../../components/SectionNext';
+import { addScore, unlock } from '../../components/teaching/arcadeStore';
 import { teachingHistory } from '../../data/teaching';
+
+const RANKS = ['S', 'A', 'A', 'B', 'B', 'C'];
 
 export default function TeachHistory() {
   const ref = useScrollAnimation(100);
+  const sectionRef = useRef(null);
+  const timers = useRef([]);
+  const [opened, setOpened] = useState(() => new Set());
+
+  const open = (i) => {
+    setOpened((prev) => (prev.has(i) ? prev : new Set(prev).add(i)));
+  };
+
+  // 스크롤로 들어오면 퀘스트가 순차적으로 열린다 — 클릭하지 않아도 보상 내용이 드러나도록.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        teachingHistory.forEach((_, i) => {
+          timers.current.push(setTimeout(() => open(i), 900 + i * 520));
+        });
+      },
+      { threshold: 0.15 },
+    );
+    io.observe(el);
+    const t = timers.current;
+    return () => { io.disconnect(); t.forEach(clearTimeout); };
+  }, []);
+
+  // 자동 공개보다 먼저 누르면 보너스 점수
+  const claim = (i) => {
+    if (opened.has(i)) return;
+    addScore(60);
+    open(i);
+  };
+
+  useEffect(() => {
+    if (opened.size === teachingHistory.length) unlock('quest-clear');
+  }, [opened]);
 
   return (
-    <section id="history" style={styles.section}>
+    <section id="history" ref={sectionRef} style={styles.section}>
       <SectionHeading
-        eyebrow="History"
+        eyebrow="Quest Log"
         title="강의 이력"
-        subtitle="국비·국기 과정에서 게임 프로그래밍을 가르친 기록."
+        subtitle="Code Agent·AI 활용 강의부터 국비·국기 과정 게임 프로그래밍까지 — 퀘스트를 눌러 보상을 확인하세요."
       />
 
-      <div ref={ref} style={styles.list}>
-        {teachingHistory.map((h) => (
-          <article key={h.org + h.period} className="project-card" style={styles.card}>
-            <div style={styles.head}>
-              <div>
-                <h3 style={styles.org}>{h.org}</h3>
-                <span style={styles.role}>{h.role}</span>
+      <div ref={ref} className="quest-log">
+        {teachingHistory.map((h, i) => {
+          const active = h.period.includes('현재');
+          const questNo = String(teachingHistory.length - i).padStart(2, '0');
+          const isOpen = opened.has(i);
+
+          return (
+            <article
+              key={h.org + h.period}
+              className={`quest${active ? ' active' : ''}${isOpen ? ' opened' : ''}`}
+              onClick={() => claim(i)}
+            >
+              <div className="quest-rail">
+                <span className="quest-rank arcade">{RANKS[i] || 'C'}</span>
               </div>
-              <span style={styles.period}>{h.period}</span>
-            </div>
 
-            <p style={styles.desc}>{h.desc}</p>
+              <div className="quest-body">
+                <div className="quest-top">
+                  <span className="quest-no arcade">QUEST {questNo}</span>
+                  <span className={`quest-status arcade${active ? ' on' : ''}`}>
+                    {active ? '● IN PROGRESS' : '✓ CLEARED'}
+                  </span>
+                </div>
 
-            <div style={styles.metaRow}>
-              {h.courseType && <span style={styles.metaTag}>{h.courseType}</span>}
-              {h.audience && <span style={styles.metaTag}>대상 · {h.audience}</span>}
-            </div>
+                <div className="quest-head">
+                  <div>
+                    <h3 className="quest-org">{h.org}</h3>
+                    <span className="quest-role">{h.role}</span>
+                  </div>
+                  <span className="quest-period">{h.period}</span>
+                </div>
 
-            {h.subjects?.length > 0 && (
-              <div style={styles.subjects}>
-                {h.subjects.map((s) => (
-                  <span key={s} className="tech-chip" style={styles.chip}>{s}</span>
-                ))}
+                <p className="quest-desc">{h.desc}</p>
+
+                <div className="quest-meta">
+                  {h.courseType && <span className="quest-tag">{h.courseType}</span>}
+                  {h.audience && <span className="quest-tag">대상 · {h.audience}</span>}
+                </div>
+
+                {h.subjects?.length > 0 && (
+                  <div className="quest-loot">
+                    <span className="quest-loot-label arcade">
+                      {isOpen ? '✓ REWARD' : 'REWARD ▸ 클릭해서 먼저 열기'}
+                    </span>
+                    <div className="quest-loot-items">
+                      {h.subjects.map((s, k) => (
+                        <span
+                          key={s}
+                          className="loot-chip"
+                          style={{ transitionDelay: `${k * 70}ms` }}
+                        >
+                          + {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
 
       <SectionNext to="curriculum" />
@@ -50,15 +125,4 @@ export default function TeachHistory() {
 
 const styles = {
   section: { padding: '6rem 2rem', maxWidth: '900px', margin: '0 auto' },
-  list: { display: 'flex', flexDirection: 'column', gap: '1.25rem' },
-  card: { gap: '0.85rem' },
-  head: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' },
-  org: { fontSize: '1.15rem', fontWeight: 700, color: 'var(--text)' },
-  role: { fontSize: '0.85rem', color: 'var(--accent-2)' },
-  period: { fontSize: '0.8rem', fontFamily: 'var(--font-mono)', color: 'var(--text-mute)', whiteSpace: 'nowrap' },
-  desc: { fontSize: '0.92rem', color: 'var(--text-mute)', lineHeight: 1.7 },
-  metaRow: { display: 'flex', gap: '0.5rem', flexWrap: 'wrap' },
-  metaTag: { fontSize: '0.74rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)', padding: '0.25rem 0.6rem', border: '1px solid var(--border-2)', borderRadius: '999px' },
-  subjects: { display: 'flex', gap: '0.5rem', flexWrap: 'wrap' },
-  chip: { fontSize: '0.78rem' },
 };

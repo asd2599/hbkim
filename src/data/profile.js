@@ -40,6 +40,14 @@ export const profile = {
   // TODO(hbkim): keyword / aliases / hint / behind 실제 내용으로 채우기.
   career: [
     {
+      // 현재 소속. CareerQuiz(About '스무고개')는 quiz 데이터가 있는 과거 경력만 출제하므로
+      // 여기엔 quiz 를 두지 않는다.
+      period: '2026.07 – 현재',
+      company: '민코딩',
+      role: 'AI 강사',
+      desc: '기업 대상 AI 강의 — Claude Code·Codex 등 Code Agent 활용, Gemini·기업 전용 에이전트 등 AI 활용 교육',
+    },
+    {
       period: '2023.12 – 2025.12',
       company: 'SBS게임아카데미',
       role: '게임 프로그래밍 강사',

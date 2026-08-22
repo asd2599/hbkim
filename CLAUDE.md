@@ -4,11 +4,16 @@ Guidance for AI coding agents working on this repo. Keep changes minimal, consis
 
 ## Project
 
-Personal portfolio site for **Kim Hyunbok (hbkim)**, targeting **AI Service Engineer** roles broadly (AI 서비스 개발 / AI 풀스택 / 바이브 코딩 — not narrowed to AI FDE). Deployed at **hbkim.cloud**.
+Personal site for **Kim Hyunbok (hbkim)**. Deployed at **hbkim.cloud**. Two positionings, two routes:
 
-Home page introduces the developer; **each project has its own on-site detail page** (`/projects/:slug`) telling problem → approach → architecture → results. The portfolio lives on this site — do NOT depend on external Notion as the portfolio source.
+- **`/` (default/home) — AI 강사 (AI instructor).** Current primary activity: teaching Code Agent usage (Claude Code, Codex, etc.) and AI utilization (Gemini, enterprise-dedicated agents, etc.) via corporate in-house training and public/community lectures. Content lives in `src/data/teaching.js`, rendered by `pages/Teaching.jsx`. This page is indexed (no noindex) since it's now the main identity.
+- **`/portfolio` (hidden, not linked from nav) — AI Service Engineer.** Targets AI 서비스 개발 / AI 풀스택 / 바이브 코딩 roles broadly. Content lives in `src/data/profile.js` + `src/data/projects.js`, rendered by `pages/Home.jsx`. **Each project has its own on-site detail page** (`/projects/:slug`) telling problem → approach → architecture → results. `pages/Home.jsx` sets `noindex` + overrides `document.title` while mounted, mirroring how `/teaching` used to be hidden before the swap. The portfolio lives on this site — do NOT depend on external Notion as the portfolio source.
 
-Positioning to convey: 10y game dev + teaching → AI full-stack. Strengths = ships real AI products fast (vibe coding), full-stack + AI integration (LLM, RAG, multimodal Vision/STT, Function Calling agents, realtime).
+Positioning to convey on `/portfolio`: 10y game dev + teaching → AI full-stack. Strengths = ships real AI products fast (vibe coding), full-stack + AI integration (LLM, RAG, multimodal Vision/STT, Function Calling agents, realtime).
+
+Positioning to convey on `/` (teaching): 8y programming instructor (game academies) + hands-on AI full-stack builder → now an **AI instructor at 민코딩 (Mincoding) since 2026.07**, teaching Code Agent workflows (Claude Code, Codex) and AI utilization (Gemini, enterprise agents) **to corporate clients (기업 대상)**. That employer, start date, and audience are confirmed — everything else about the current teaching activity (client company names, headcounts, metrics) is not: don't invent it. The current role lives in `profile.js` `career[0]` and flows into `teachingHistory` automatically.
+
+The RAG chatbot's knowledge source is `api/knowledge.js` (`KNOWLEDGE_MD`) — keep it in sync with `profile.js`/`teaching.js` when positioning changes. After editing `api/knowledge.js`, regenerate embeddings with `npm run embed` (requires `OPENAI_API_KEY` in `.env`) so `api/embeddings.js` reflects the new text.
 
 ## Tech Stack
 
@@ -25,11 +30,13 @@ Do not introduce further dependencies without a clear need; prefer the standard 
 ```
 src/
   main.jsx           # BrowserRouter root
-  App.jsx            # Routes: "/" -> Home, "/projects/:slug" -> ProjectDetail
+  App.jsx            # Routes: "/" -> Teaching (default), "/portfolio" -> Home (hidden), "/projects/:slug" -> ProjectDetail
   index.css
-  data/       projects.js, profile.js   # SINGLE SOURCE of truth for content
-  pages/      Home, ProjectDetail        # routed pages
-  sections/   Hero, About, Skills, Projects, Contact   # home sections, top-to-bottom
+  data/       projects.js, profile.js, teaching.js   # SINGLE SOURCE of truth for content
+  pages/      Teaching (default "/"), Home (hidden "/portfolio"), ProjectDetail   # routed pages
+  sections/   Hero, About, Skills, Projects, Contact   # "/portfolio" sections, top-to-bottom
+  sections/teaching/  TeachHero, Philosophy, TeachHistory, Curriculum, BonusStage, TeachContact   # "/" sections, top-to-bottom
+  components/teaching/ arcadeStore.js, ArcadeHud.jsx, ArcadeFx.jsx, teachNav.js  # "/" 게임 연출(점수·업적·이펙트)
   components/ Sidebar, SectionNav, MobileHeader, Navbar, ScrollToTop  # layout/nav, reused
   hooks/      useActiveSection, useScrollAnimation, useScrollProgress
   assets/
@@ -44,6 +51,7 @@ Conventions:
 - ProjectDetail renders only the optional sections present in the data object (overview / problem / approach / architecture / results / retrospective).
 - One home section = one file in `sections/`. Reusable UI/layout goes in `components/`; shared behavior in `hooks/`.
 - Keep nav data (section ids/labels) in sync across `Sidebar`, `SectionNav`.
+- `/` is themed as a blue **arcade**: score/level/combo HUD, achievement toasts, click particles, card flip, skill tree, bonus minigame, Konami easter egg. State lives in `components/teaching/arcadeStore.js` (module-scope store + `useSyncExternalStore`, no state lib). Game flourishes must never hide content — anything revealed by interaction also auto-reveals on scroll, and `prefers-reduced-motion` disables the animations.
 
 ## Styling & Responsive
 
